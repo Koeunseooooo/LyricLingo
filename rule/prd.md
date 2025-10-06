@@ -35,7 +35,7 @@
 
 ### 3.3 AI 해석 카드 (플립카드)
 
-- 각 문장 클릭 시 해석 카드 표시
+- 각 문장에 대한 해석 카드 표시
 - 카드 정보:
   - 자연스러운 번역 및 의미
   - 문화적 배경, 밈, 비유적 표현
@@ -91,28 +91,7 @@
 
 ---
 
-## 7. 성공 지표 (Metrics)
-
-- 월간 활성 사용자(MAU)
-- 학습 완료율
-- 카드 저장률
-- 퀴즈 정답률
-- 재학습(복습) 이용률
-
----
-
-## 8. 기술 구성(초안)
-
-- **Frontend**: React, Next.js, TypeScript, TailwindCSS
-- **Backend**: Node.js (Express) / Python (Flask or FastAPI)
-- **AI**: Claude Sonnet 3.5
-- **DB**: PostgreSQL (학습 데이터, 사용자 카드) or Firebase Store
-- **Infra**: Vercel / AWS
-- **Auth**: OAuth (Google, Kakao, etc.)
-
----
-
-## 9. 향후 확장 계획
+## 7. 향후 확장 계획
 
 - 영어 외 타 언어(일본어, 스페인어 등) 지원
 - AI 음성 인식 기반 발음 학습 기능 추가

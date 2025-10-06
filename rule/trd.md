@@ -21,7 +21,7 @@
 [Backend: Node.js or Spring Boot]
 ↓
 
-[AI Layer: OpenAI GPT API / Claude API]
+[AI Layer: Claude API]
 
 ↓
 
@@ -48,7 +48,7 @@
 
 | 항목      | 기술                                                     | 이유                                           |
 | --------- | -------------------------------------------------------- | ---------------------------------------------- |
-| Framework | **Node.js (Express or NestJS)** / **Spring Boot**        | REST API 구성에 용이, AI 요청/응답 라우팅 중심 |
+| Framework | **Node.js (Express or NestJS)**                          | REST API 구성에 용이, AI 요청/응답 라우팅 중심 |
 | Auth      | MVP 단계에서는 제외                                      | 로그인/회원 기능은 추후 확장                   |
 | API 관리  | Axios or Fetch                                           | AI 응답 캐싱 및 로깅 지원                      |
 | 배포      | **Firebase Functions** 또는 **AWS Lambda + API Gateway** | 서버리스 구조로 초기 유지보수 부담 최소화      |
@@ -167,16 +167,7 @@
 
 ---
 
-## 8. MVP 범위
-
-| 포함 기능                 | 제외 기능        |
-| ------------------------- | ---------------- |
-| 노래 검색 및 가사 표시    | 로그인/회원가입  |
-| AI 문장 추출 및 카드 생성 | 소셜 공유 기능   |
-| 퀴즈 생성 및 학습         | 레벨 시스템      |
-| 카드 저장 및 로컬 복습    | 다국어 번역 확장 |
-
-## 9. 향후 확장 포인트
+## 8. 향후 확장 포인트
 
 - 로그인 추가 → 사용자별 학습 히스토리 관리
 - PostgreSQL 전환 → 학습 데이터 정형 분석
@@ -200,10 +191,10 @@
 
 ## 11. 결론
 
-- **MVP 핵심**: “AI가 가사 속 표현을 뽑고, 학습카드로 해석해주는 경험”
+- **MVP 핵심**: “AI가 가사 속 표현을 뽑고, 학습카드로 해석 및 퀴즈를 통한 학습 경험”
 - **추천 스택 조합**:
   - FE: Next.js + TypeScript + Vercel
   - BE: Node.js + Firebase Functions
   - DB: Firestore
   - AI: Claude 3.5 Sonnet + GPT-4o-mini 조합
-- 로그인·레벨·추천 시스템은 추후 확장 시점에서 PostgreSQL 및 AWS로 이전 고려
+- 로그인·레벨·추천 시스템은 추후 확장 시점에서 PostgreSQL 및 AWS 혹은 네이버 클라우드로 이전 고려
