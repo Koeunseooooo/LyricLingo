@@ -2,8 +2,8 @@ import { Loader2 } from 'lucide-react';
 
 export function AIProcessingScreen() {
   return (
-    <div className="h-full flex items-center justify-center bg-background px-6">
-      <div className="text-center">
+    <div className="h-full flex flex-col items-center justify-center bg-background">
+      <div className="text-center px-6">
         <div className="mb-8 flex justify-center">
           <div className="relative">
             <Loader2 className="h-20 w-20 text-primary animate-spin" />
