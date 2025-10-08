@@ -20,7 +20,7 @@ export interface Song {
   level: string;
 }
 
-const API_URL = "https://lyriclingo-be-production.up.railway.app";
+const API_URL = "https://lyriclingo-be-production.up.railway.app/api";
 
 export async function getTrendingSongs(): Promise<Song[]> {
   try {
