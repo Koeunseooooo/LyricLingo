@@ -5,6 +5,7 @@ import { LyricsViewScreen } from "./components/LyricsViewScreen";
 import { StudyCardsScreen } from "./components/StudyCardsScreen";
 import { QuizScreen } from "./components/QuizScreen";
 import { LearningSummaryScreen } from "./components/LearningSummaryScreen";
+import { Toaster } from "./components/ui/sonner";
 
 export type Screen =
   | "search"
@@ -51,6 +52,7 @@ export default function App() {
   return (
     <div className="size-full bg-background flex justify-center">
       <div className="w-full max-w-md h-full bg-background overflow-hidden">
+        <Toaster />
         {currentScreen === "search" && (
           <SongSearchScreen onSongSelect={handleSongSelect} />
         )}

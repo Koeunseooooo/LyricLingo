@@ -7,6 +7,7 @@ import { Button } from './ui/button';
 import { SelectedSong } from '../App';
 import { getTrendingSongs, Song } from '../lib/api';
 import { Skeleton } from './ui/skeleton';
+import { toast } from 'sonner';
 
 interface SongSearchScreenProps {
   onSongSelect: (song: SelectedSong) => void;
@@ -41,6 +42,15 @@ export function SongSearchScreen({ onSongSelect }: SongSearchScreenProps) {
     } else {
       setSearchResults([]);
     }
+  };
+
+  const showNotReadyToast = () => {
+    toast("아직 준비되지 않은 기능입니다.", {
+      icon: "🚧",
+      classNames: {
+        toast: "text-base p-4",
+      },
+    });
   };
 
   const displaySongs = searchResults.length > 0 ? searchResults : songs;
@@ -148,7 +158,7 @@ export function SongSearchScreen({ onSongSelect }: SongSearchScreenProps) {
           <Button
             variant={selectedFilter === 'beginner' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setSelectedFilter('beginner')}
+            onClick={showNotReadyToast}
             className={`h-8 rounded-full flex-shrink-0 ${
               selectedFilter === 'beginner'
                 ? 'bg-foreground text-white hover:bg-foreground/90'
@@ -160,7 +170,7 @@ export function SongSearchScreen({ onSongSelect }: SongSearchScreenProps) {
           <Button
             variant={selectedFilter === 'popular' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setSelectedFilter('popular')}
+            onClick={showNotReadyToast}
             className={`h-8 rounded-full flex-shrink-0 ${
               selectedFilter === 'popular'
                 ? 'bg-foreground text-white hover:bg-foreground/90'
@@ -172,7 +182,7 @@ export function SongSearchScreen({ onSongSelect }: SongSearchScreenProps) {
           <Button
             variant={selectedFilter === 'recent' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setSelectedFilter('recent')}
+            onClick={showNotReadyToast}
             className={`h-8 rounded-full flex-shrink-0 ${
               selectedFilter === 'recent'
                 ? 'bg-foreground text-white hover:bg-foreground/90'

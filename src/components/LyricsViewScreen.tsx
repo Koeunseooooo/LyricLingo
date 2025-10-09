@@ -6,6 +6,7 @@ import { Badge } from "./ui/badge";
 import { SelectedSong, Screen } from "../App";
 import { getLyrics, Lyric } from "../lib/api";
 import { Skeleton } from "./ui/skeleton";
+import { toast } from "sonner";
 
 interface LyricsViewScreenProps {
   song: SelectedSong;
@@ -28,28 +29,49 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
     fetchLyrics();
   }, [song.id]);
 
-  const learnableCount = lyrics.filter(l => l.hasCard).length;
+  const handleToggleLyric = (lyricId: string) => {
+    setLyrics((prevLyrics) =>
+      prevLyrics.map((lyric) =>
+        lyric.id === lyricId ? { ...lyric, hasCard: !lyric.hasCard } : lyric
+      )
+    );
+  };
 
-  const LyricItem = ({ lyric }: { lyric: Lyric }) => (
+  const selectedCount = lyrics.filter((l) => l.hasCard).length;
+  const canStartLearning = selectedCount >= 5;
+  const LEARNABLE_THRESHOLD = 0.7; // Define a threshold for what is a 'learnable' lyric
+  const totalLearnableCount = lyrics.filter(
+    (l) => l.learning_score > LEARNABLE_THRESHOLD
+  ).length;
+
+  const LyricItem = ({
+    lyric,
+    onToggle,
+  }: {
+    lyric: Lyric;
+    onToggle: (id: string) => void;
+  }) => (
     <Card
-      className={`p-5 transition-all border-0 shadow-sm ${
+      onClick={() => onToggle(lyric.id)}
+      className={`p-5 border-0 cursor-pointer transition-[transform,box-shadow] duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg ${
         lyric.hasCard
-          ? "bg-gradient-to-r from-primary/5 to-secondary/5 ring-1 ring-primary/20"
-          : "bg-white"
-      }`}
-    >
+          ? "bg-gradient-to-r from-primary/5 to-secondary/5 ring-1 ring-primary/20 scale-[1.02] shadow-lg"
+          : "bg-white shadow-sm"
+      }`}>
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <p className="text-lg mb-1.5">{lyric.lyric}</p>
-          <p className="text-muted-foreground text-sm">
-            {lyric.translated}
-          </p>
+          <p className="text-muted-foreground text-sm">{lyric.translated}</p>
         </div>
-        {lyric.hasCard && (
-          <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 flex-shrink-0">
+        <Badge
+          className={`border-0 flex-shrink-0 ${
+            lyric.hasCard ? "bg-primary/10" : "bg-transparent"
+          }`}
+        >
+          <span className={lyric.hasCard ? "text-primary" : "text-transparent"}>
             학습
-          </Badge>
-        )}
+          </span>
+        </Badge>
       </div>
     </Card>
   );
@@ -95,13 +117,16 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
             size="sm"
             variant="ghost"
             className="h-9 w-9 rounded-full p-0 bg-white shadow-sm"
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() =>
+              toast("아직 준비되지 않은 기능입니다.", {
+                icon: "🚧",
+                classNames: {
+                  toast: "text-base p-4",
+                },
+              })
+            }
           >
-            {isPlaying ? (
-              <Pause className="h-4 w-4" />
-            ) : (
-              <Play className="h-4 w-4 ml-0.5" />
-            )}
+            <Play className="h-4 w-4 ml-0.5" />
           </Button>
           <div className="flex-1">
             <div className="h-1.5 bg-white rounded-full overflow-hidden">
@@ -117,12 +142,12 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
         <div className="flex items-center gap-2 p-4 bg-white rounded-xl border border-border">
           <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm">
-              AI가{" "}
-              <span className="text-primary font-semibold">
-                {learnableCount}개
+            <p className="text-sm leading-relaxed">
+              AI가 찾은 {totalLearnableCount}개의 학습 포인트 중 5개 이상
+              선택해주세요.
+              <span className="font-semibold text-primary ml-2">
+                ({selectedCount}/{totalLearnableCount})
               </span>
-              의 학습 포인트를 찾았어요
             </p>
           </div>
         </div>
@@ -142,7 +167,11 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
             </>
           ) : (
             lyrics.map((lyric) => (
-              <LyricItem key={lyric.id} lyric={lyric} />
+              <LyricItem
+                key={lyric.id}
+                lyric={lyric}
+                onToggle={handleToggleLyric}
+              />
             ))
           )}
         </div>
@@ -152,8 +181,9 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto">
         <div className="p-5 bg-gradient-to-t from-white via-white to-transparent">
           <Button
-            className="w-full h-14 bg-primary hover:bg-primary/90 shadow-lg text-base rounded-xl"
+            className="w-full h-14 bg-primary hover:bg-primary/90 shadow-lg text-base rounded-xl disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
             onClick={() => onNavigate("studyCards")}
+            disabled={!canStartLearning}
           >
             <span className="mr-2">🎵</span>
             학습 시작하기

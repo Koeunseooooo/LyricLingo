@@ -1,4 +1,5 @@
-const API_URL = "https://lyriclingo-be-production-7e27.up.railway.app/api";
+// const API_URL = "https://lyriclingo-be-production-7e27.up.railway.app/api";
+const API_URL = "http://localhost:3001/api";
 export interface SongFromAPI {
   id: number;
   title: string;
@@ -49,6 +50,7 @@ export interface Lyric {
   lyric: string;
   translated: string;
   hasCard: boolean;
+  learning_score: number;
 }
 
 interface LyricFromAPI {
@@ -70,14 +72,16 @@ export async function getLyrics(songId: string): Promise<Lyric[]> {
 
     const data: LyricFromAPI[] = await response.json();
 
-    // Adapt API data to the component's expected format
-    return data.map((item) => ({
-      id: String(item.line_no),
-      lyric: item.text,
-      translated: item.translated ?? "",
-      // TODO: Base hasCard on learning_score when logic is defined
-      hasCard: true,
-    }));
+    // Adapt API data, setting hasCard to false by default for manual selection
+    return data
+      .map((item) => ({
+        id: String(item.line_no),
+        lyric: item.text,
+        translated: item.translated ?? "",
+        hasCard: false, // Default to false for manual selection
+        learning_score: item.learning_score,
+      }))
+      .sort((a, b) => parseInt(a.id) - parseInt(b.id));
   } catch (error) {
     console.error("Error fetching lyrics:", error);
     return [];
