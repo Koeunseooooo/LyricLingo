@@ -1,58 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Play, Pause, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { SelectedSong, Screen } from "../App";
+import { getLyrics, Lyric } from "../lib/api";
+import { Skeleton } from "./ui/skeleton";
 
 interface LyricsViewScreenProps {
   song: SelectedSong;
   onNavigate: (screen: Screen) => void;
 }
 
-const mockLyrics = [
-  {
-    id: "1",
-    korean: "너는 나의 소울메이트",
-    romaji: "neoneun naui soulmate",
-    hasCard: true,
-  },
-  {
-    id: "2",
-    korean: "영원히 함께할 거야",
-    romaji: "yeongwonhi hamkkehal geoya",
-    hasCard: true,
-  },
-  {
-    id: "3",
-    korean: "사랑해 너를 사랑해",
-    romaji: "saranghae neoreul saranghae",
-    hasCard: true,
-  },
-  {
-    id: "4",
-    korean: "매일매일 너만 생각해",
-    romaji: "maeilmaeil neoman saenggakae",
-    hasCard: false,
-  },
-  {
-    id: "5",
-    korean: "우리 둘이 함께 걷는 이 길",
-    romaji: "uri duri hamkke geotneun i gil",
-    hasCard: true,
-  },
-  {
-    id: "6",
-    korean: "별빛 아래서 춤을 춰",
-    romaji: "byeolbit araeseo chumeul chwo",
-    hasCard: true,
-  },
-];
-
 export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [lyrics, setLyrics] = useState<Lyric[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const learnableCount = mockLyrics.filter((l) => l.hasCard).length;
+  useEffect(() => {
+    const fetchLyrics = async () => {
+      if (!song.id) return;
+      setIsLoading(true);
+      const fetchedLyrics = await getLyrics(song.id);
+      setLyrics(fetchedLyrics);
+      setIsLoading(false);
+    };
+    fetchLyrics();
+  }, [song.id]);
+
+  const learnableCount = lyrics.filter(l => l.hasCard).length;
+
+  const LyricItem = ({ lyric }: { lyric: Lyric }) => (
+    <Card
+      className={`p-5 transition-all border-0 shadow-sm ${
+        lyric.hasCard
+          ? "bg-gradient-to-r from-primary/5 to-secondary/5 ring-1 ring-primary/20"
+          : "bg-white"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-lg mb-1.5">{lyric.lyric}</p>
+          <p className="text-muted-foreground text-sm">
+            {lyric.translated}
+          </p>
+        </div>
+        {lyric.hasCard && (
+          <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 flex-shrink-0">
+            학습
+          </Badge>
+        )}
+      </div>
+    </Card>
+  );
+
+  const LyricItemSkeleton = () => (
+    <Card className="p-5 bg-white border-0 shadow-sm">
+      <div className="space-y-2">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    </Card>
+  );
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -72,7 +81,7 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
           <img
             src={song.coverUrl}
             alt={`${song.title} album cover`}
-            className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex-shrink-0 shadow-md"
+            className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex-shrink-0 shadow-md object-cover"
           />
           <div className="flex-1 min-w-0">
             <h2 className="truncate mb-1">{song.title}</h2>
@@ -123,30 +132,19 @@ export function LyricsViewScreen({ song, onNavigate }: LyricsViewScreenProps) {
       <div className="flex-1 overflow-y-auto px-5 pb-24">
         <h3 className="mb-4">가사</h3>
         <div className="space-y-3">
-          {mockLyrics.map((lyric) => (
-            <Card
-              key={lyric.id}
-              className={`p-5 transition-all border-0 shadow-sm ${
-                lyric.hasCard
-                  ? "bg-gradient-to-r from-primary/5 to-secondary/5 ring-1 ring-primary/20"
-                  : "bg-white"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-lg mb-1.5">{lyric.korean}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {lyric.romaji}
-                  </p>
-                </div>
-                {lyric.hasCard && (
-                  <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 flex-shrink-0">
-                    학습
-                  </Badge>
-                )}
-              </div>
-            </Card>
-          ))}
+          {isLoading ? (
+            <>
+              <LyricItemSkeleton />
+              <LyricItemSkeleton />
+              <LyricItemSkeleton />
+              <LyricItemSkeleton />
+              <LyricItemSkeleton />
+            </>
+          ) : (
+            lyrics.map((lyric) => (
+              <LyricItem key={lyric.id} lyric={lyric} />
+            ))
+          )}
         </div>
       </div>
 

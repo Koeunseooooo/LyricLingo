@@ -1,3 +1,4 @@
+const API_URL = "https://lyriclingo-be-production-7e27.up.railway.app/api";
 export interface SongFromAPI {
   id: number;
   title: string;
@@ -20,8 +21,6 @@ export interface Song {
   level: string;
 }
 
-const API_URL = "https://lyriclingo-be-production.up.railway.app/api";
-
 export async function getTrendingSongs(): Promise<Song[]> {
   try {
     const response = await fetch(`${API_URL}/songs`);
@@ -41,6 +40,46 @@ export async function getTrendingSongs(): Promise<Song[]> {
     }));
   } catch (error) {
     console.error("Error fetching trending songs:", error);
+    return [];
+  }
+}
+
+export interface Lyric {
+  id: string;
+  lyric: string;
+  translated: string;
+  hasCard: boolean;
+}
+
+interface LyricFromAPI {
+  line_no: number;
+  text: string;
+  translated?: string;
+  learning_score: number;
+}
+
+/**
+ * Fetch lyrics for a given song from backend
+ */
+export async function getLyrics(songId: string): Promise<Lyric[]> {
+  try {
+    const response = await fetch(`${API_URL}/lyrics?song=${songId}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch lyrics: ${response.status}`);
+    }
+
+    const data: LyricFromAPI[] = await response.json();
+
+    // Adapt API data to the component's expected format
+    return data.map((item) => ({
+      id: String(item.line_no),
+      lyric: item.text,
+      translated: item.translated ?? "",
+      // TODO: Base hasCard on learning_score when logic is defined
+      hasCard: true,
+    }));
+  } catch (error) {
+    console.error("Error fetching lyrics:", error);
     return [];
   }
 }
